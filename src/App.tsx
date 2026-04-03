@@ -1,5 +1,5 @@
 import React from 'react';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { Users, Utensils, Coffee, Disc, PieChart, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -32,18 +32,17 @@ function Navigation() {
               <span className="font-bold text-xl text-gray-900 hidden sm:block">分帳工具</span>
             </Link>
           </div>
-          
-          {/* Desktop Menu */}
+
           <div className="hidden md:flex md:items-center md:space-x-4">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  "px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                  'px-3 py-2 rounded-md text-sm font-medium transition-colors',
                   location.pathname === item.path
-                    ? "bg-indigo-50 text-indigo-700"
-                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                    ? 'bg-indigo-50 text-indigo-700'
+                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                 )}
               >
                 <div className="flex items-center gap-2">
@@ -54,7 +53,6 @@ function Navigation() {
             ))}
           </div>
 
-          {/* Mobile Menu Button */}
           <div className="flex items-center md:hidden">
             <Button variant="ghost" size="icon" onClick={() => setIsOpen(!isOpen)}>
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -63,7 +61,6 @@ function Navigation() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden bg-white border-b border-gray-200 py-2 px-4 space-y-1">
           {navItems.map((item) => (
@@ -72,10 +69,10 @@ function Navigation() {
               to={item.path}
               onClick={() => setIsOpen(false)}
               className={cn(
-                "block px-3 py-2 rounded-md text-base font-medium",
+                'block px-3 py-2 rounded-md text-base font-medium',
                 location.pathname === item.path
-                  ? "bg-indigo-50 text-indigo-700"
-                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  ? 'bg-indigo-50 text-indigo-700'
+                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
               )}
             >
               <div className="flex items-center gap-3">
