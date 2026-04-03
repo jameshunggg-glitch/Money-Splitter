@@ -1,0 +1,78 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: members
+    // Document ID: auto-generated or manual UUID
+    // Fields:
+    //   - id: string (required)
+    //   - name: string (required)
+    //   - isActive: bool (required)
+    //   - createdAt: timestamp (required)
+    //
+    // Collection: expenses
+    // Document ID: auto-generated or manual UUID
+    // Fields:
+    //   - id: string (required)
+    //   - category: string (required, 'ingredients' or 'drinks')
+    //   - title: string (required)
+    //   - amount: number (required, >= 0)
+    //   - paidByMemberId: string (required)
+    //   - expenseDate: timestamp (required)
+    //   - participants: list of strings (required)
+    //   - note: string (optional)
+    //   - createdAt: timestamp (required)
+    //
+    // Collection: mahjong_sessions
+    // Document ID: auto-generated or manual UUID
+    // Fields:
+    //   - id: string (required)
+    //   - title: string (required)
+    //   - sessionDate: timestamp (required)
+    //   - results: list of maps (required)
+    //     - memberId: string
+    //     - netAmount: number
+    //   - note: string (optional)
+    //   - createdAt: timestamp (required)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isValidString(val, min, max) {
+      return val is string && val.size() >= min && val.size() <= max;
+    }
+
+    function isValidNumber(val, min) {
+      return val is number && val >= min;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /members/{memberId} {
+      allow read: if true; // Publicly readable for the app to work without login requirement per spec
+      allow write: if true; // Publicly writable for MVP simplicity per spec (no auth requirement)
+    }
+
+    match /expenses/{expenseId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /mahjong_sessions/{sessionId} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+}

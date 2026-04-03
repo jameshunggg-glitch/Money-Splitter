@@ -1,0 +1,5 @@
+{
+  "name": "多人分帳工具 (Expense Splitter)",
+  "description": "支援食材、飲料支出與麻將勝負紀錄的多人分帳 Web App，自動產生轉帳建議。",
+  "requestFramePermissions": []
+}

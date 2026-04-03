@@ -1,0 +1,73 @@
+{
+  "entities": {
+    "Member": {
+      "title": "Member",
+      "description": "A person who can participate in expense splitting.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "isActive": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "isActive"]
+    },
+    "Expense": {
+      "title": "Expense",
+      "description": "An expense record for ingredients or drinks.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "category": { "type": "string", "enum": ["ingredients", "drinks"] },
+        "title": { "type": "string" },
+        "amount": { "type": "number" },
+        "paidByMemberId": { "type": "string" },
+        "expenseDate": { "type": "string", "format": "date-time" },
+        "participants": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "note": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "category", "title", "amount", "paidByMemberId", "expenseDate", "participants"]
+    },
+    "MahjongSession": {
+      "title": "Mahjong Session",
+      "description": "A record of a mahjong game session.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "sessionDate": { "type": "string", "format": "date-time" },
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "memberId": { "type": "string" },
+              "netAmount": { "type": "number" }
+            }
+          }
+        },
+        "note": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "sessionDate", "results"]
+    }
+  },
+  "firestore": {
+    "/members/{memberId}": {
+      "schema": "Member",
+      "description": "Collection of members."
+    },
+    "/expenses/{expenseId}": {
+      "schema": "Expense",
+      "description": "Collection of expenses."
+    },
+    "/mahjong_sessions/{sessionId}": {
+      "schema": "MahjongSession",
+      "description": "Collection of mahjong sessions."
+    }
+  }
+}
