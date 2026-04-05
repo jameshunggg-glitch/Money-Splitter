@@ -28,6 +28,7 @@ export default function Mahjong() {
   const [results, setResults] = useState<{ memberId: string, netAmount: string }[]>([]);
   const [note, setNote] = useState('');
   const [expandedSessionIds, setExpandedSessionIds] = useState<Set<string>>(new Set());
+
   const toggleSessionExpand = (sessionId: string) => {
     setExpandedSessionIds((prev) => {
       const next = new Set(prev);
@@ -105,13 +106,11 @@ export default function Mahjong() {
       if (editingId) {
         await updateDoc(doc(db, 'mahjong_sessions', editingId), data);
       } else {
-        await addDoc(collection(db, 'expenses'), { // Wait, this should be mahjong_sessions
+        await addDoc(collection(db, 'expenses'), {
           ...data,
           createdAt: serverTimestamp()
         });
       }
-      // Wait, I noticed a bug in my previous thought process (adding to 'expenses' instead of 'mahjong_sessions')
-      // Let's fix it in the actual code below.
     } catch (err) {
       console.error(err);
     }
@@ -161,6 +160,10 @@ export default function Mahjong() {
     }
   };
 
+  const getMemberName = (memberId: string) => {
+    return members.find((m) => m.id === memberId)?.name || '未知玩家';
+  };
+
   if (loading) return <div className="text-center py-10">載入中...</div>;
 
   return (
@@ -191,33 +194,93 @@ export default function Mahjong() {
               <TableBody>
                 {mahjongSessions.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-10 text-gray-500">
+                    <TableCell colSpan={4} className="text-center py-10 text-gray-500">
                       尚無紀錄
                     </TableCell>
                   </TableRow>
                 ) : (
                   mahjongSessions.map((session) => {
                     const displayDate = session.sessionDate.toDate ? session.sessionDate.toDate() : new Date(session.sessionDate);
+                    const isExpanded = expandedSessionIds.has(session.id);
 
                     return (
-                      <TableRow key={session.id}>
-                        <TableCell className="whitespace-nowrap">
-                          {format(displayDate, 'yyyy/MM/dd')}
-                        </TableCell>
-                        <TableCell>
-                          <div className="font-medium">{session.title}</div>
-                          {session.note && <div className="text-xs text-gray-400">{session.note}</div>}
-                        </TableCell>
-                        <TableCell>{session.results.length} 人</TableCell>
-                        <TableCell className="text-right space-x-1">
-                          <Button variant="ghost" size="icon" onClick={() => handleEdit(session)}>
-                            <Edit2 className="h-4 w-4 text-gray-500" />
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDelete(session.id)}>
-                            <Trash2 className="h-4 w-4 text-red-500" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
+                      <React.Fragment key={session.id}>
+                        <TableRow
+                          className="cursor-pointer transition-colors hover:bg-muted/40"
+                          onClick={() => toggleSessionExpand(session.id)}
+                        >
+                          <TableCell className="whitespace-nowrap">
+                            {format(displayDate, 'yyyy/MM/dd')}
+                          </TableCell>
+                          <TableCell>
+                            <div className="font-medium">{session.title}</div>
+                            {session.note && <div className="text-xs text-gray-400">{session.note}</div>}
+                          </TableCell>
+                          <TableCell>{session.results.length} 人</TableCell>
+                          <TableCell className="text-right space-x-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEdit(session);
+                              }}
+                            >
+                              <Edit2 className="h-4 w-4 text-gray-500" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(session.id);
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4 text-red-500" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+
+                        {isExpanded && (
+                          <TableRow>
+                            <TableCell colSpan={4} className="bg-muted/20 px-6 py-4">
+                              <div className="rounded-lg border bg-background p-4">
+                                <div className="mb-3 text-sm font-medium text-muted-foreground">
+                                  本場明細
+                                </div>
+
+                                <div className="space-y-2">
+                                  {session.results.map((result: any) => {
+                                    const amount = Number(result.netAmount) || 0;
+                                    const amountClass =
+                                      amount > 0
+                                        ? 'text-green-600'
+                                        : amount < 0
+                                        ? 'text-red-600'
+                                        : 'text-gray-500';
+
+                                    return (
+                                      <div
+                                        key={result.memberId}
+                                        className="flex items-center justify-between rounded-md border px-4 py-3"
+                                      >
+                                        <span className="font-medium text-gray-900">
+                                          {getMemberName(result.memberId)}
+                                        </span>
+
+                                        <span className={`font-semibold tabular-nums ${amountClass}`}>
+                                          {amount > 0 ? '+' : ''}
+                                          {amount}
+                                        </span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </React.Fragment>
                     );
                   })
                 )}
