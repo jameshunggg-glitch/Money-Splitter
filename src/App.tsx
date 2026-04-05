@@ -12,7 +12,7 @@ const navItems = [
   { name: '成員管理', path: '/members', icon: Users },
   { name: '食材支出', path: '/ingredients', icon: Utensils, category: 'ingredients' },
   { name: '飲料支出', path: '/drinks', icon: Coffee, category: 'drinks' },
-  { name: '麻將紀錄', path: '/mahjong', icon: Disc },
+  { name: '遊戲紀錄', path: '/mahjong', icon: Disc },
   { name: '總結算', path: '/summary', icon: PieChart },
 ];
 
