@@ -170,8 +170,8 @@ export default function Mahjong() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">麻將紀錄</h1>
-          <p className="text-gray-500">記錄每場麻將的最終勝負金額</p>
+          <h1 className="text-2xl font-bold text-gray-900">遊戲紀錄</h1>
+          <p className="text-gray-500">打工十年還是工 一朝All in著皇宮</p>
         </div>
         <Button onClick={handleOpenAdd} className="gap-2">
           <Plus className="h-4 w-4" />
