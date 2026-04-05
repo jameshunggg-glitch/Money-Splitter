@@ -27,6 +27,20 @@ export default function Mahjong() {
   const [date, setDate] = useState<Date>(new Date());
   const [results, setResults] = useState<{ memberId: string, netAmount: string }[]>([]);
   const [note, setNote] = useState('');
+  const [expandedSessionIds, setExpandedSessionIds] = useState<Set<string>>(new Set());
+  const toggleSessionExpand = (sessionId: string) => {
+    setExpandedSessionIds((prev) => {
+      const next = new Set(prev);
+
+      if (next.has(sessionId)) {
+        next.delete(sessionId);
+      } else {
+        next.add(sessionId);
+      }
+
+      return next;
+    });
+  };
 
   const activeMembers = members.filter(m => m.isActive);
 
@@ -171,7 +185,6 @@ export default function Mahjong() {
                   <TableHead className="w-[120px]">日期</TableHead>
                   <TableHead>場次名稱</TableHead>
                   <TableHead>玩家數</TableHead>
-                  <TableHead>勝負摘要</TableHead>
                   <TableHead className="text-right">操作</TableHead>
                 </TableRow>
               </TableHeader>
@@ -185,8 +198,6 @@ export default function Mahjong() {
                 ) : (
                   mahjongSessions.map((session) => {
                     const displayDate = session.sessionDate.toDate ? session.sessionDate.toDate() : new Date(session.sessionDate);
-                    const winners = session.results.filter(r => r.netAmount > 0);
-                    const winnerNames = winners.map(w => members.find(m => m.id === w.memberId)?.name).join(', ');
 
                     return (
                       <TableRow key={session.id}>
@@ -198,9 +209,6 @@ export default function Mahjong() {
                           {session.note && <div className="text-xs text-gray-400">{session.note}</div>}
                         </TableCell>
                         <TableCell>{session.results.length} 人</TableCell>
-                        <TableCell>
-                          <div className="text-xs text-green-600 font-medium truncate max-w-[150px]">贏家: {winnerNames || '無'}</div>
-                        </TableCell>
                         <TableCell className="text-right space-x-1">
                           <Button variant="ghost" size="icon" onClick={() => handleEdit(session)}>
                             <Edit2 className="h-4 w-4 text-gray-500" />
