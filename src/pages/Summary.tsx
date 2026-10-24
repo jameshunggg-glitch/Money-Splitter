@@ -1,19 +1,22 @@
 import React, { useMemo } from 'react';
+import { useParams } from 'react-router-dom';
 import { ArrowRight, Wallet, TrendingUp, TrendingDown, RefreshCcw } from 'lucide-react';
-import { useData } from '../hooks/useData';
+import { useTripData } from '../hooks/useData';
 import { calculateSummary } from '../utils/calculations';
+import { formatDateRange } from '../utils/dates';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 export default function Summary() {
-  const { members, expenses, mahjongSessions, loading } = useData();
+  const { tripId } = useParams();
+  const { trip, members, tripMembers, expenses, mahjongSessions, loading } = useTripData(tripId);
 
   const { memberSummaries, settlements } = useMemo(() => {
     if (loading) return { memberSummaries: [], settlements: [] };
-    return calculateSummary(members, expenses, mahjongSessions);
-  }, [members, expenses, mahjongSessions, loading]);
+    return calculateSummary(tripMembers, expenses, mahjongSessions);
+  }, [tripMembers, expenses, mahjongSessions, loading]);
 
   if (loading) return <div className="text-center py-10">載入中...</div>;
 
@@ -25,7 +28,11 @@ export default function Summary() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">總結算</h1>
-        <p className="text-gray-500">匯總所有支出與麻將勝負，提供最終轉帳建議</p>
+        <p className="text-gray-500">
+          {trip?.name}
+          {trip && formatDateRange(trip.startDate, trip.endDate) && ` · ${formatDateRange(trip.startDate, trip.endDate)}`}
+          ：匯總這趟的支出與麻將勝負，提供最終轉帳建議
+        </p>
       </div>
 
       {/* Stats Overview */}

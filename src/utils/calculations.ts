@@ -8,9 +8,9 @@ export function calculateSummary(members: Member[], expenses: Expense[], mahjong
     net: number;
   }>();
 
-  // Initialize with all members who have at least one record or are active
+  // Initialize with every given member (the trip's participants) plus anyone with a record
   const memberIdsWithData = new Set<string>();
-  members.filter(m => m.isActive).forEach(m => memberIdsWithData.add(m.id));
+  members.forEach(m => memberIdsWithData.add(m.id));
   expenses.forEach(e => {
     memberIdsWithData.add(e.paidByMemberId);
     e.participants.forEach(p => memberIdsWithData.add(p));

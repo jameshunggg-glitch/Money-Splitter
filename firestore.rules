@@ -13,10 +13,20 @@ service cloud.firestore {
     //   - isActive: bool (required)
     //   - createdAt: timestamp (required)
     //
+    // Collection: trips
+    // Document ID: auto-generated ('default' for records created before trips existed)
+    // Fields:
+    //   - name: string (required)
+    //   - startDate: timestamp (optional)
+    //   - endDate: timestamp (optional)
+    //   - memberIds: list of strings (required)
+    //   - createdAt: timestamp (required)
+    //
     // Collection: expenses
     // Document ID: auto-generated or manual UUID
     // Fields:
     //   - id: string (required)
+    //   - tripId: string (required)
     //   - category: string (required, 'ingredients' or 'drinks')
     //   - title: string (required)
     //   - amount: number (required, >= 0)
@@ -30,6 +40,7 @@ service cloud.firestore {
     // Document ID: auto-generated or manual UUID
     // Fields:
     //   - id: string (required)
+    //   - tripId: string (required)
     //   - title: string (required)
     //   - sessionDate: timestamp (required)
     //   - results: list of maps (required)
@@ -63,6 +74,11 @@ service cloud.firestore {
     match /members/{memberId} {
       allow read: if true; // Publicly readable for the app to work without login requirement per spec
       allow write: if true; // Publicly writable for MVP simplicity per spec (no auth requirement)
+    }
+
+    match /trips/{tripId} {
+      allow read: if true;
+      allow write: if true;
     }
 
     match /expenses/{expenseId} {

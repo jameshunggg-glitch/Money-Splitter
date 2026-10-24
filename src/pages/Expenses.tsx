@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { Plus, Edit2, Trash2, Calendar as CalendarIcon, Info } from 'lucide-react';
 import { collection, addDoc, updateDoc, doc, deleteDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { format } from 'date-fns';
 import { zhTW } from 'date-fns/locale';
 import { db } from '../firebase';
-import { useData } from '../hooks/useData';
+import { useTripData } from '../hooks/useData';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -23,7 +24,8 @@ interface ExpensesProps {
 }
 
 export default function Expenses({ category }: ExpensesProps) {
-  const { members, expenses, loading } = useData();
+  const { tripId } = useParams();
+  const { members, tripMembers, expenses, loading } = useTripData(tripId);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -36,14 +38,13 @@ export default function Expenses({ category }: ExpensesProps) {
   const [note, setNote] = useState('');
 
   const filteredExpenses = expenses.filter(e => e.category === category);
-  const activeMembers = members.filter(m => m.isActive);
 
   const resetForm = () => {
     setTitle('');
     setAmount('');
     setPaidBy('');
     setDate(new Date());
-    setParticipants(activeMembers.map(m => m.id));
+    setParticipants(tripMembers.map(m => m.id));
     setNote('');
     setEditingId(null);
   };
@@ -72,6 +73,7 @@ export default function Expenses({ category }: ExpensesProps) {
     }
 
     const data = {
+      tripId,
       category,
       title,
       amount: parseFloat(amount),
@@ -246,10 +248,12 @@ export default function Expenses({ category }: ExpensesProps) {
               <Label>付款人</Label>
               <Select value={paidBy} onValueChange={setPaidBy}>
                 <SelectTrigger>
-                  <SelectValue placeholder="選擇付款人" />
+                  <SelectValue>
+                    {(value: string | null) => members.find(m => m.id === value)?.name ?? '選擇付款人'}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  {activeMembers.map(m => (
+                  {tripMembers.map(m => (
                     <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
                   ))}
                 </SelectContent>
@@ -264,13 +268,16 @@ export default function Expenses({ category }: ExpensesProps) {
                   variant="ghost" 
                   size="sm" 
                   className="h-7 text-xs"
-                  onClick={() => setParticipants(activeMembers.map(m => m.id))}
+                  onClick={() => setParticipants(tripMembers.map(m => m.id))}
                 >
                   全選
                 </Button>
               </div>
               <div className="grid grid-cols-2 gap-2 border rounded-md p-3 max-h-40 overflow-y-auto">
-                {activeMembers.map((member) => (
+                {tripMembers.length === 0 && (
+                  <div className="col-span-2 text-center text-sm text-gray-400 py-2">這趟旅程還沒有參加成員，請到「旅程」頁編輯</div>
+                )}
+                {tripMembers.map((member) => (
                   <div key={member.id} className="flex items-center space-x-2">
                     <Checkbox
                       id={`p-${member.id}`}

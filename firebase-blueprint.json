@@ -1,5 +1,22 @@
 {
   "entities": {
+    "Trip": {
+      "title": "Trip",
+      "description": "A trip that groups expenses and mahjong sessions.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "startDate": { "type": "string", "format": "date-time" },
+        "endDate": { "type": "string", "format": "date-time" },
+        "memberIds": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "memberIds"]
+    },
     "Member": {
       "title": "Member",
       "description": "A person who can participate in expense splitting.",
@@ -18,6 +35,7 @@
       "type": "object",
       "properties": {
         "id": { "type": "string" },
+        "tripId": { "type": "string" },
         "category": { "type": "string", "enum": ["ingredients", "drinks"] },
         "title": { "type": "string" },
         "amount": { "type": "number" },
@@ -30,7 +48,7 @@
         "note": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["id", "category", "title", "amount", "paidByMemberId", "expenseDate", "participants"]
+      "required": ["id", "tripId", "category", "title", "amount", "paidByMemberId", "expenseDate", "participants"]
     },
     "MahjongSession": {
       "title": "Mahjong Session",
@@ -38,6 +56,7 @@
       "type": "object",
       "properties": {
         "id": { "type": "string" },
+        "tripId": { "type": "string" },
         "title": { "type": "string" },
         "sessionDate": { "type": "string", "format": "date-time" },
         "results": {
@@ -53,13 +72,17 @@
         "note": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["id", "title", "sessionDate", "results"]
+      "required": ["id", "tripId", "title", "sessionDate", "results"]
     }
   },
   "firestore": {
     "/members/{memberId}": {
       "schema": "Member",
       "description": "Collection of members."
+    },
+    "/trips/{tripId}": {
+      "schema": "Trip",
+      "description": "Collection of trips."
     },
     "/expenses/{expenseId}": {
       "schema": "Expense",

@@ -5,8 +5,18 @@ export interface Member {
   createdAt: any;
 }
 
+export interface Trip {
+  id: string;
+  name: string;
+  startDate?: any;
+  endDate?: any;
+  memberIds: string[]; // Member IDs participating in this trip
+  createdAt: any;
+}
+
 export interface Expense {
   id: string;
+  tripId: string;
   category: 'ingredients' | 'drinks';
   title: string;
   amount: number;
@@ -24,6 +34,7 @@ export interface MahjongResult {
 
 export interface MahjongSession {
   id: string;
+  tripId: string;
   title: string;
   sessionDate: any;
   results: MahjongResult[];
